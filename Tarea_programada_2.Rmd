@@ -1,0 +1,84 @@
+---
+title: "Limpieza de datos - 2_tarea_Programada"
+author: "Rachit Vargas"
+date: "10/22/2020"
+output: html_document
+---
+
+# Paquetes
+
+```{r}
+library(tidyverse)
+library(lubridate)
+```
+
+
+
+```{r}
+?system.time
+
+system.time(contoso_sales <- read_delim("C:/Users/User/Downloads/contoso_sales.csv", delim = " "))
+
+Canales <- data.frame(
+  channelKey = c(1,2,4),
+  Canal = c("Moto", "Vehículo", "Barco"),
+  stringsAsFactors = FALSE
+)
+
+```
+
+# Revisar que se halla cargado de la manera correcta
+
+```{r}
+# Primeras lineas
+head(contoso_sales)
+
+# Encabezados
+colnames(contoso_sales)
+
+#Formato
+str(contoso_sales)
+glimpse(contoso_sales)
+
+```
+
+
+```{r}
+contoso_trabajar <- contoso_sales %>% 
+  select(ends_with("Key"), SalesQuantity, UnitCost, UnitPrice, TotalCost, SalesAmount)
+
+glimpse(contoso_trabajar)
+```
+
+# Coersiones necesarias
+
+```{r}
+
+contoso_coerciones <- contoso_trabajar %>% 
+  mutate(DateKey = dmy(DateKey),
+         UnitCost = str_replace(UnitPrice, ",", "."),
+         UnitPrice = str_replace(UnitPrice, ",", "."),
+         UnitCost = as.numeric(UnitCost),
+         UnitPrice = as.numeric(UnitPrice))
+
+glimpse(contoso_coerciones)
+
+```
+
+
+# Combinacion de datos
+```{r}
+
+contoso_coerciones_con_canal <- contoso_coerciones %>% 
+  left_join(Canales, by = "channelKey")
+
+glimpse(contoso_coerciones_con_canal)
+
+contoso_coerciones_con_canal <- contoso_coerciones_con_canal %>% 
+  mutate(Canal = replace_na(Canal, "Avion"))
+
+glimpse(contoso_coerciones_con_canal)
+
+
+```
+
