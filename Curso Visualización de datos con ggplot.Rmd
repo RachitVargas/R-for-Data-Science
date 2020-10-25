@@ -1,0 +1,265 @@
+---
+title: "ggplot"
+author: "Rachit Vargas"
+date: "27/6/2020"
+output: html_document
+---
+
+# Paquetes
+
+```{r Carga de Paquete, warning=FALSE , message=FALSE, eval=FALSE}
+
+library(tidyverse)
+
+```
+
+
+# Base
+
+```{r, eval=FALSE}
+mpg <- mpg
+?mpg
+head(mpg)
+
+str(mpg)
+
+```
+
+
+#Prime grafico
+
+```{r}
+
+g1 = ggplot(data = mpg, mapping = aes(displ, hwy)) +
+  geom_point()
+g1
+
+plot(mpg$displ, mpg$hwy)
+
+g2 = ggplot(mpg, mapping = aes(displ, hwy, color = class)) +
+  geom_point()
+
+g2
+
+g3 = ggplot(mpg, aes(displ, hwy, size = hwy)) + 
+  geom_point()
+
+g3
+
+g4 = ggplot(mpg, aes(displ, hwy, alpha = class)) + 
+  geom_point()
+
+g4
+
+g5 = ggplot(mpg, aes(displ, hwy, shape = class)) + 
+  geom_point()
+
+g5
+
+g6 = ggplot(mpg, mapping = aes(displ, hwy, color = class, size = hwy))+
+  geom_point()
+
+g6
+
+
+```
+
+# Facet
+
+```{r}
+
+g7 = ggplot(mpg, aes(displ, hwy, color = class)) +
+  geom_point()+
+  facet_wrap(~class)
+
+g7
+
+
+g8 = ggplot(mpg, aes(displ, hwy, color = class)) +
+  geom_point()+
+  facet_grid(drv ~cyl)
+
+g8
+
+```
+
+
+#Objetos Geograficos
+
+```{r}
+
+g9 = ggplot(mpg, aes(displ, hwy)) +
+  geom_smooth()
+  
+g9
+
+g10 = ggplot(mpg, aes(displ, hwy)) +
+  geom_smooth(se = FALSE) +
+  geom_point()
+
+g10  
+
+g11 = ggplot(mpg, aes(displ, hwy)) +
+  geom_point(se = FALSE) +
+  geom_smooth(method = "lm", se = F)
+
+g11
+
+
+
+
+```
+
+
+#Barras
+
+```{r}
+
+diamantes = diamonds
+?diamonds
+
+g12 = ggplot(diamantes, aes(cut, fill = clarity))+
+  geom_bar(position = "dodge")
+
+g12
+
+
+g13 = ggplot(diamantes, aes(cut, fill = clarity))+
+  geom_bar(position = "fill")
+
+g14 = Control <- read_delim("C:/Users/User/Documents/Rachit/Rstudio/R for Data Science/Second class/Archivo_empresa.csv", delim = ";", col_names = T)
+
+g14 = ggplot(Control, aes(Frecuencia, Equipo, fill = Equipo))+
+  geom_bar(stat = 'identity')+
+  coord_flip()
+
+g14
+
+
+```
+
+# Histogramas
+
+```{r}
+
+g15 = ggplot(diamantes, aes(carat, fill = cut))+
+  geom_histogram(binwidth = 0.5)
+
+g15
+
+```
+
+
+# Jitter
+
+```{r}
+## jitter 
+
+g16 = ggplot(mpg, aes(displ, hwy, color = class))+
+  geom_point(position = 'jitter')
+
+g16
+
+```
+
+
+# Boxplot
+
+```{r}
+## Van crear un grafico de barras el data diamentes y van a rotar el eje 
+
+g17 = ggplot(mpg, aes(class, hwy))+
+  geom_boxplot()+
+  coord_flip()
+
+g17
+
+```
+
+
+# Detallando
+
+```{r}
+
+library(ggthemes)
+
+g18 = ggplot(mpg, aes(x = displ, y = hwy)) +
+  geom_point(mapping = aes(color = class)) +
+  labs(
+    title = "Evaluacion de displ vs hwy",
+    subtitle = "Grow up",
+    caption = "Fuente Base de Datos MPG Act Oct 2020",
+    x = "Displ (Litros)",
+    y = "hwy (Millas por galon)")+
+  theme_minimal() +
+  theme(
+    legend.position = 'top')+
+  geom_text(aes(label=hwy), nudge_x = 0.1, nudge_y = 2)
+  
+  
+
+g18
+
+
+```
+
+
+
+#Arreglando ejes
+
+```{r}
+
+
+
+
+grafico_base = ggplot(mpg, aes(displ, hwy)) +
+  geom_point(mapping = aes(color = class)) 
+
+grafico_base
+
+g19 = ggplot(mpg, aes(displ, hwy))+
+  geom_point(aes(color = class))+
+  scale_x_continuous(labels = NULL)+
+  scale_y_continuous(labels = NULL)
+
+g19
+  
+
+g20 = ggplot(mpg, aes(displ, hwy))+
+  geom_point(aes(color = class))+
+  scale_x_continuous(breaks = seq(1,12, by = 2))+
+  scale_y_continuous(breaks = seq(5,60, by = 5))
+
+g20
+
+```
+
+
+#Leyenda
+
+
+```{r}
+g21 = grafico_base + theme(
+  legend.position = 'left', legend.direction = 'vertical'
+)
+
+g21
+
+```
+
+# Poniendo todo lo aprendido a trabajar (a sacar los mas grandes hwy)
+
+```{r}
+
+
+```
+
+#Algo de estadistica
+
+```{r}
+
+
+
+```
+
+
