@@ -1,0 +1,97 @@
+---
+title: "Primera Tarea Programada"
+author: "Rachit Vargas"
+date: "10/11/2020"
+output:
+  html_document: default
+---
+
+#Import library and data as csv
+```{r}
+library(tidyverse)
+data = read.csv(
+  'C:/Users/User/Downloads/TiendasCampaña.csv', sep = ';'
+  )
+```
+
+
+#write data as csv in my workspace, import data_1 and became data frame
+```{r}
+write.csv(data, 'C:/Users/User/Documents/Rachit/Rstudio/R for Data Science/Tarea_Programada_1/data_1.csv', row.names = FALSE)
+
+data_1 = read.csv('C:/Users/User/Documents/Rachit/Rstudio/R for Data Science/Tarea_Programada_1/data_1.csv',sep = ',')
+
+dframe = data.frame(data_1)
+
+#remove unnecessary data
+rm(list = setdiff(ls(), "dframe"))
+```
+
+
+#Show data structure
+```{r}
+str(dframe)
+```
+
+
+#Show first and last observations
+```{r}
+head(dframe, n = 7)
+tail(dframe, n = 7)
+```
+
+
+#Dimensions 
+```{r}
+dim(dframe)
+```
+
+
+#Add column, show str and dim
+```{r}
+dframe$Vendido = c(0,4,3,2,3,4,4,0,2,0,0,0,1,1,0,2,3,2,3,0,3,1,0,1,4,4,3,4,4,2,1,1,1,4,4,3,1,3,1,0,1,1,2,4,2,2,0,4,3,0,4,1,0,4,2,3,2,4,3,4,0,0,2,2,0,0,1,4,3,2,3,1,3,3,3,0,0,4,4,0,2,1,0,2,1,4,3,0,4,3)
+
+str(dframe)
+dim(dframe)
+```
+
+
+
+#factors
+```{r}
+factor_marca = factor(dframe$Marca)
+factor_uso = factor(dframe$Uso)
+```
+
+
+
+#factor and sort the station column
+```{r}
+factor_estacion = factor(dframe$Estacion,
+                         levels = c('primavera', 'verano', 'otonho'),
+                         labels = c('primavera', 'verano', 'otonho'))
+factor_estacion
+str(factor_estacion)
+```
+
+
+
+#Consult data
+```{r}
+#Convert the column to a vector and then call position 55 of the vector
+campania_55 = c(dframe$Precio)
+campania_55[55]
+
+#or call directly
+dframe$Precio[55]
+
+```
+
+
+
+#new data frame
+```{r}
+new_data_frame = filter(dframe, Vendido != 0)
+str(new_data_frame)
+```
+
