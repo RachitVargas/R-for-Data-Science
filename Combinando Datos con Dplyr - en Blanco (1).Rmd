@@ -1,0 +1,256 @@
+---
+title: "Combinación de Datos con Dplyr"
+author: "Esteban Madrigal"
+date: "1/8/2020"
+output: html_document
+---
+
+# Combinación de Datos con Dplyr
+
+## Principales Funciones
+
+* Inner Join
+* Left Join
+* Right Join
+* Full Join
+* Semi Join
+* Anti Join
+* Intersect
+* Union
+* Setdiff
+* Bind Rows
+* Bind Cols
+* Distinct
+
+
+# Paquetes
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+
+```
+
+
+# Data a Trabajar
+
+#### Vamos a trabajar con un Archivo de control de Salidas y Legadas de Pedidos
+
+##### - Columnas de Tiempo: Anio, Mes, Dia
+##### - Columnas de salida y llegada: Salida Pedido, Llegada_Pronosticada, Llegada_Real
+##### - Detalle del pedido: Id_Producto:
+##### - Detalle Destino: Destino y Distancia_KM
+
+
+
+```{r, message=FALSE, warning=FALSE}
+
+# Cargamos el Archivo (Colcan su Ruta Correspondiente)
+Control <- read_delim("C:/Users/User/Documents/Rachit/Rstudio/R for Data Science/Second Class/Archivo_empresa.csv", delim = ";")
+
+head(Control)
+  
+```
+
+
+
+#### Adicional vamos a crear DataFrame mediante código para ayudarnos en el transcurso del curso
+
+```{r}
+#Paises
+Todos_Los_Destinos <- data.frame(
+  Destino = c("Destino 1","Destino 2","Destino 3"),
+  Pais = c("Costa Rica", "México", "Colombia")
+)
+
+
+#Nombre de la columnas Destino Diferente
+Todos_Los_Destinos_DL <- data.frame(
+  Entrega = c("Destino 1","Destino 2","Destino 3"),
+  Pais = c("Costa Rica", "México", "Colombia")
+)
+
+
+#Destino 2 Duplicado
+Destino_2_Duplicado <- data.frame(
+  Destino = c("Destino 1","Destino 2","Destino 2","Destino 3"),
+  Pais = c("Costa Rica", "México","México", "Colombia")
+)
+
+
+#Sin Destino 3
+Sin_Destino_3 <- data.frame(
+  Destino = c("Destino 1","Destino 2"),
+  Pais = c("Costa Rica", "México")
+)
+
+
+#Con Destino 4
+Con_Destino_4 <- data.frame(
+  Destino = c("Destino 1","Destino 2","Destino 3", "Destino 4"),
+  Pais = c("Costa Rica", "México", "Colombia", "Chile")
+)
+```
+
+
+
+# Columnas Llaves
+
+#### Una Columnas LLave es un columna que sus datos sirve para relacionarse con otros. No necesariamente las columnas deben de llamarse igual **pero sus datos si deben de tener el mismo formato**. Estos datos puede permanercer multiples veces en toda la columna del dataframe.
+
+#### Como un consejo la mejor practica es manejar estas llaves incluso si el dato es numerico. Ejemplo Codigo del cliente, numero de pasarporte, Cedula de Identidad etc.
+
+```{r}
+head(Control)
+
+head(Todos_Los_Destinos)
+
+head(Todos_Los_Destinos_DL)
+
+head(Destino_2_Duplicado)
+
+```
+
+
+# Inner Join
+
+## Busca los Valores de la Tabla A en la Tabla B y agrega la información. Los valores que no se encontraron, procede al filtrarlos
+
+```{r}
+ inner_join_1 = Control %>% 
+  inner_join(Todos_Los_Destinos)
+
+inner_join_2 = Control %>% 
+  left_join(Todos_Los_Destinos_DL, by = c('Destino' = 'Entrega'))
+
+```
+
+
+# Left Join
+
+## Busca los Valores de la Tabla A en la Tabla B y agrega la información. Conserva los Valores de la Tabla A que no se encontraron en B
+
+
+```{r}
+left_join_1 = Control %>% 
+  left_join(Sin_Destino_3, by = 'Destino')
+
+left_join_2 = Control %>% 
+  left_join(Todos_Los_Destinos_DL, by = c("Destino" = "Entrega"))
+
+```
+
+
+# Right Join
+
+## Busca los Valores de la Tabla B en la Tabla A y agrega la información. Conserva los Valores de la Tabla B que no se encontraron en A
+
+```{r}
+
+right_join_1 = Control %>% 
+  right_join(Con_Destino_4, by = 'Destino')
+
+```
+
+
+# Full Join
+
+## Buscar todos los Valores de la Tabla A en la Tabla B y agrega la información. Los valores que no encontro, también los agrega en la tabla resultante.(Es poco frecuente que se utilice este tipo de join)
+
+
+```{r}
+full_join_1 = Control %>% 
+  full_join(Con_Destino_4, by = 'Destino')
+
+```
+
+
+# Duplicidad en los Datos
+
+## Parte de ser expertos en datos es conocer nuestra información y saber los datos que tenemos. Así como los errores que se nos puedan presentar. La duplicidad de los datos es un error muy común a la hora de los datos. Se debe a que es nuestras tablas hay datos duplicados en ambas columnas llaves.
+
+
+```{r}
+error_dulicidad = Control %>% 
+  left_join(Destino_2_Duplicado, by = 'Destino')
+
+arreglo = Destino_2_Duplicado %>% 
+  distinct(Destino, Pais, .keep_all = TRUE)
+
+left_join_3 = Control %>% 
+  left_join(arreglo, by = 'Destino')
+
+```
+
+
+# Semi Join y Anti Join
+
+## Estos tipos de Join a diferencia de agregar data, filtran la Tabla A
+
+## Semi Join: Filtra los valores de la Tabla A según los valores que esten en la Tabla B
+
+## Anti Join: Filtra los valores de la Tabla A  que no estan  en la Tabla B
+
+```{r}
+
+semi_join_1 = Control %>% 
+  semi_join(Sin_Destino_3, by = "Destino")
+
+anti_join_1 = Control %>% 
+  anti_join(Sin_Destino_3,by = 'Destino')
+
+```
+
+
+
+# Parte 2 Combininaciones
+
+## Para esta parte vamos a definir de igual forma Data Frames manuales para enteder los verbos.
+
+```{r}
+Base_A <- data.frame(
+  x = c(1,2),
+  y = c(1,1)
+)
+
+Base_B <- data.frame(
+  x = c(1,1),
+  y = c(1,2)
+)
+```
+
+
+# Intersect: Devuleve las filas que coinciden en Ambas Bases.
+
+```{r}
+intersect_1 = interaction(Base_A, Base_B)
+```
+
+
+# Union: Une todas las filas  de ambos datasets para crear uno nuevo excluyendo las repetidas en ambos.
+
+```{r}
+
+union_1 = union(Base_A, Base_B)
+
+```
+
+# Setdiff: Returna las filas que de la Tabla A que no esta en la B.
+
+```{r}
+setdiff_1 = setdiff(Base_A, Base_B)
+
+```
+
+# Bind Rows: Coloca la Tabla A debajo de la Tabla B.
+
+```{r}
+bind_rows_a = bind_rows(Base_A, Base_B)
+
+```
+
+#Bind Cols: Coloca la Tabla B al lado derecho de las Tabla A.
+
+```{r}
+bind_cols_a = bind_cols(Base_A, Base_B)
+
+```
+
