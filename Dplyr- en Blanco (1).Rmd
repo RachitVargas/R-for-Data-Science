@@ -1,0 +1,326 @@
+---
+title: "Tidyverse - dplyr"
+author: "Esteban Madrigal"
+date: "26/7/2020"
+output:
+  pdf_document: default
+  html_document: default
+---
+
+install.packages('tidyverse', dependencies = T)
+library(tidyverse)
+
+
+# Tidyverse - DPLYR
+
+## Principales Funciones
+
+* Filter: Filtrar valores
+* Arrange: Ordenar Valores
+* Rename: Renombrar Columnas
+* Select: Seleccionar Columnas
+* Mutate: Creacion o Modificacion de Columnas
+* Group_By: Aplicar operaciones por grupo
+* Summarize: Realizar sumarisazión de datos (Se utiliza mucho con Group_By)
+
+
+# Paquetes
+```{r, message=FALSE, warning=FALSE}
+library(tidyverse)
+```
+
+
+# Data a Trabajar
+
+#### Vamos a trabajar con un Archivo de control de Salidas y Legadas de Pedidos
+
+##### - Columnas de Tiempo: Anio, Mes, Dia
+##### - Columnas de salida y llegada: Salida Pedido, Llegada_Pronosticada, Llegada_Real
+##### - Detalle del pedido: Id_Producto:
+##### - Detalle Destino: Destino y Distancia_KM
+
+
+
+```{r, message=FALSE, warning=FALSE}
+
+# Cargamos el Archivo (Colcan su Ruta Correspondiente)
+Control <- read_delim("C:/Users/User/Documents/Rachit/Rstudio/R for Data Science/Second class/Archivo_empresa.csv", delim = ";")
+  
+```
+
+# Visualizacion de los datos
+
+```{r,eval=F}
+head(Control)
+tail(Control)
+summary(Control)
+str(Control)
+
+glimpse(Control)
+# Viene dentro del Paquete Dplyr
+
+```
+
+
+# Filter
+
+```{r,eval=F}
+
+# Vamos al Filtrar Los pedidos de Junio de todos los Años
+
+
+base_1 = filter(Control, Mes == 6, Anio == 2013)
+base_2 = filter(Control, Mes == 6, Anio == 2013, Destino == 'Destino 3')
+base_3 = filter(Control, Mes == 6, Anio == 2013, Destino == 'Destino 2')
+
+# Vamos a filtrar Los Pedidos de Junio 2013
+
+
+
+# Vamos a Filtrar Destinos 2
+
+
+```
+
+# Operados Lógicos
+
+##### - Menor que: <
+##### - Mayor que: >
+##### - Menor o igual que: <=
+##### - Mayor o igual que: >=
+##### - Igual que: ==
+##### - No Igual: !=
+##### - Negacion: !
+##### - OR: |
+##### - AND: &
+##### - %in%: Operador Comodin de Contiene
+
+
+```{r,eval=F}
+# Vamos a Filtrar Distancias mayores a 149km
+
+base_4 = filter(Control,Distancia_KM > 150)
+
+
+# Vamos a Filtrar Destinos diferentes al Destino 2
+
+
+base_5 = filter(Control, Destino != 'Destino 2')
+
+# Vamos a Filtar Los viajes que la Llega Pronosticas es igual a la Real
+
+base_6 = filter(Control, Llegada_Pronosticada == Llegada_Real)
+
+# %in% Contiene
+
+v_1 = c(507,79,101)
+
+base_7 = filter(Control, Id_Producto %in% v_1)
+
+base_8 = filter(Control, !Id_Producto %in% v_1)
+
+```
+
+# Arrange
+
+```{r,eval=F}
+# Vamos a Ordenar de los destinos de menor distancia en kilometros
+
+base_9 = arrange(Control, Distancia_KM)
+
+# Vamos a Ordenar de los destinos de Mayor distancia en kilomentros
+
+base_10 = arrange(Control, desc(Distancia_KM))
+                  
+                  
+# Vamos a Ordenar de los destinos de Mayor distancia en kilomentros, menor tiempo Lllegada Pronosticada y Destino Descendente
+
+base_11 = arrange(Control, desc(Distancia_KM), Llegada_Pronosticada, desc(Destino))
+
+```
+
+# Select
+
+```{r,eval=F}
+
+#Consultar el nombre de las columnas
+colnames(Control)
+
+# Seleccionar por Nombre
+base_12 = select(Control, Dia, Anio, Mes, Distancia_KM)
+colnames(base_12)
+
+# Seleccionar por Posicion
+base_13 = select(Control, 3:4)
+
+
+# Deseleccionar
+base_12 = select(Control, -Dia, -Anio, -Mes, -Distancia_KM)
+base_13 = select(Control, -3,-4)
+
+# Seleccionar o deseleccionar por rango
+
+base_14 = select(Control, Mes:Distancia_KM)
+base_15 = select(Control,Anio:Salida_Pedido, Id_Producto:Distancia_KM)
+base_16 = select(Control, 3:5)
+
+# Operadores de Seleccion start_with(), ends_with(), contains()
+
+base_17 = select(Control, starts_with("Llegada"))
+base_18 = select(Control, ends_with("Pedido"))
+base_19 = select(Control, contains('_'))
+
+# everything()
+
+base_20 = select(Control, Anio, Mes, everything()) 
+
+```
+
+
+# Mutate
+
+```{r,eval=F}
+# Vamos a crear una nueva variable que muestra la variable Distancia en Metros
+
+base_21 = mutate(Control, Distancia_Mtrs = Distancia_KM * 1000)
+
+#Vamos a modificiar distancia_km para que esa columna tenga el dato en metros
+
+base_22 = mutate(Control, Anio = 2014)
+
+# Vamos a agregar despues del Destino la palabra "Ruta Segura"
+
+base_23 = mutate(Control, Destino = paste(Destino, 'Ruta', sep = '-'), 
+                 Revisada = 'si')
+
+```
+
+# Mutante y Funciones Logicas
+
+```{r, eval=F}
+#if_else: vamos a crear una columnas que diga si la llegada pronosticada es igual a la real indique llegada perfecta caso contrario No fue una llegada perfecta
+
+base_24 = mutate(Control, 
+                 Detalle_viaje = if_else(Llegada_Pronosticada == Llegada_Real, 'Llegada Perfecta', 'Llegada Imperfecta'))
+
+
+base_25 = mutate(Control, Provincia = if_else(Destino == 'Destino 1', 'San Jose', if_else(Destino == 'Destino 2', 'Cartago', 'Heredia')))
+
+
+# case_when: necesitamos crear una columnas que diga , si el Destino es igual a
+# Destino 1 igual Costa Rica
+# Destino 2 igual Colombia
+# Destino 3 igual Uruguay
+
+base_26 = mutate(Control, 
+                 Pais = case_when(
+                   Destino == 'Destino 1' ~ 'Costa Rica'
+                   Destino == 'Destino 2' ~ 'Colombia'
+                   Destino == 'Destino 3' ~ 'Uruguay'
+                 ))
+
+
+```
+
+# Rename
+
+```{r,eval=F}
+# Renombre la Columna Anio por Year
+
+base_27 = rename(Control, Year = Anio)
+
+# Nuevo Nombre = Columnas a Cambiar
+
+
+base_28 = rename(Control, Day = Dia, Year = Anio, Month = Mes)
+
+#Renombre la columnas Anio por Year, Mes por Month, Dia por Day
+
+
+
+```
+
+# Operador Pipe %>%
+
+```{r,eval=F}
+# Vamos a manipula una base
+
+# - Selecionar Anio Mes 
+# - Vamos a Crear 3 columnas nuevas Anio_Texto,Mes_Texto Y crear una columnas con el numero de Fila
+# - Ordenamos por el Numero de Fila de manera descendente
+# - Concatenamos  las columnas de Texto y creamos la variable fecha
+# - No dejamos las fechas solo de Junio 2013
+
+
+
+#Sin el pipe
+base_sin_pipe = select(Control, Anio, Mes)
+base_sin_pipe = mutate(base_sin_pipe, Anio_texto = as.character(Anio),
+                       Mes_texto = as.character(Mes),
+                       ID_Fila = row_number())  
+
+base_sin_pipe = arrange(base_sin_pipe, desc(ID_Fila))
+base_sin_pipe= mutate(base_sin_pipe,
+                      Fecha = paste(Anio_texto, Mes_texto,'01', sep = '-'))
+base_sin_pipe = filter(base_sin_pipe, Mes_texto == '6')
+
+
+#Con el Pipe control + shift + M
+
+base_sin_pipe = Control %>% 
+  select(Anio, Mes) %>% 
+  mutate(Anio_texto =as.character(Anio),
+         Mes_texto = as.character(Mes),
+         ID_Fila = row_number()) %>%
+  arrange(desc(ID_Fila)) %>% 
+  mutate(Fecha = paste(Anio_texto, Mes_texto, '01', sep = '-')) %>% 
+  filter(Mes_texto == '6')
+
+```
+
+# Group_by y Summarize
+
+```{r,eval=F}
+glimpse(Control)
+
+#Genere el total de viajes por destino
+
+
+
+#Genere el total de viajes por destino por mes
+
+Base_29 = Control %>% 
+  group_by(Anio, Mes) %>% 
+  mutate(Total_Viajes =n(),
+         Total_KM = sum(Distancia_KM, na.rm = TRUE))
+
+
+#Genere el total de km por destino pero ahora usando summarize
+
+
+Base_30 = Control %>% 
+  group_by(Destino, Mes) %>% 
+  mutate(Total_Viajes =n(),
+         Total_KM = sum(Distancia_KM, na.rm = TRUE))
+
+
+
+#Genere un numero una fila con la cantidad de filas por destino pero ahora usando summarize
+
+
+##Funciones Utiles
+
+
+# Centrales: mean(), median()
+# 
+# distribucion: sd(), IQR(), 
+# 
+# Range: min(), max(), quantile()
+# 
+# poaicion first(), last(), 
+# 
+# Conteo: n(), n_distinct()
+
+
+```
+
